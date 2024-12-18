@@ -262,37 +262,6 @@ tuple<Fixed, bool, pair<int, int>> propagate_flow(int x, int y, pair<int, int> s
     return {ret, 1, sink};
 }
 
-//    for (auto [dx, dy]: deltas) {
-//        int nx = x + dx, ny = y + dy;
-//        if (field[nx][ny] != '#' && last_use[nx][ny] < UT) {
-//            auto cap = velocity.get(x, y, dx, dy);
-//            auto flow = velocity_flow.get(x, y, dx, dy);
-//            if (flow == cap) {
-//                continue;
-//            }
-//            // assert(v >= velocity_flow.get(x, y, dx, dy));
-//            auto vp = min(lim, cap - flow);
-//            if (last_use[nx][ny] == UT - 1) {
-//                velocity_flow.add(x, y, dx, dy, vp);
-//                last_use[x][y] = UT;
-////                 cerr << x << " " << y << " -> " << nx << " " << ny << " " << vp << " / " << lim << "\n";
-//                return {vp, 1, {nx, ny}};
-//            }
-//            auto [t, prop, end] = propagate_flow(nx, ny, vp);
-//            ret += t;
-//            if (prop) {
-//                velocity_flow.add(x, y, dx, dy, t);
-//                last_use[x][y] = UT;
-//                // cerr << x << " " << y << " -> " << nx << " " << ny << " " << t << " / " << lim << "\n";
-//                return {t, prop && end != pair(x, y), end};
-//            }
-//        }
-//    }
-//    last_use[x][y] = UT;
-//    return {ret, 0, {0, 0}};
-//}
-
-
 Fixed random01() {
     return Fixed::from_raw((rnd() & ((1 << 16) - 1)));
 }
@@ -384,7 +353,6 @@ bool propagate_move(int x, int y, bool is_first) {
         auto [dx, dy] = deltas[d];
         nx = x + dx;
         ny = y + dy;
-//        assert(velocity.get(x, y, dx, dy) > 0 && field[nx][ny] != '#' && last_use[nx][ny] < UT);
 
         ret = (last_use[nx][ny] == UT - 1 || propagate_move(nx, ny, false));
     } while (!ret);
@@ -465,7 +433,6 @@ int main() {
         }
 
         // Make flow from velocities
-//        velocity_flow = {};
         for (auto &t : velocity_flow.v) {
             for (auto &j : t) {
                 for (auto &k : j) {
@@ -500,13 +467,6 @@ int main() {
             }
         } while (prop);
 
-//        for (int k = 0; k < N; ++k) {
-//            for (int t = 0; t < M; ++t) {
-//                for (auto f : velocity.v[k][t]) {
-//                    std::cerr << f << " ";
-//                } std::cerr << '\n';
-//            }
-//        }
 //        std::cerr << "iters/N*M=" << (float)iters / (float)(N * M) << '\n';
 //        std::cerr << "cycle iters=" << cycle_iters <<'\n';
 
