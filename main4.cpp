@@ -158,7 +158,7 @@ VectorField velocity{}, velocity_flow{};
 int last_use[N][M]{};
 int UT = 0;
 
-
+static int threads_number = 4;
 mt19937 rnd(1337);
 
 size_t iters = 0;
@@ -171,7 +171,7 @@ tuple<Fixed, bool, pair<int, int>> propagate_flow(int x, int y, pair<int, int> s
 //    }
 //    last_use[x][y] = UT - 1;
     Fixed ret = 0;
-    omp_set_num_threads(4);
+    omp_set_num_threads(threads_number);
 
     while (true) {
         map<pair<int, int>, pair<int, int>> parent{};
@@ -377,7 +377,12 @@ bool propagate_move(int x, int y, bool is_first) {
 
 int dirs[N][M]{};
 
-int main() {
+int main(int argc, char *argv[]) {
+
+    if (argc > 1) {
+        threads_number = atoi(argv[1]);
+    }
+
     rho[' '] = 0.01;
     rho['.'] = 1000;
     Fixed g = 0.1;
