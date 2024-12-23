@@ -1,5 +1,7 @@
 #include <bits/stdc++.h>
 #include <omp.h>
+#include <ctime>
+#include <cstdio>
 
 using namespace std;
 
@@ -166,10 +168,6 @@ size_t iters = 0;
 tuple<Fixed, bool, pair<int, int>> propagate_flow(int x, int y, pair<int, int> sink) {
     if (last_use[x][y] > UT) return {0, 0, {0, 0}};
     ++iters;
-//    if (lim == 0) {
-//        return {0, 0, {0, 0}};
-//    }
-//    last_use[x][y] = UT - 1;
     Fixed ret = 0;
     omp_set_num_threads(threads_number);
 
@@ -397,6 +395,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    double start = clock();
     for (size_t i = 0; i < T; ++i) {
 
         Fixed total_delta_p = 0;
@@ -424,7 +423,6 @@ int main(int argc, char *argv[]) {
                         auto contr = velocity.get(nx, ny, -dx, -dy);
                         if (contr * rho[(int) field[nx][ny]] >= force) {
                             velocity.add(nx, ny, -dx, -dy, - force / rho[(int) field[nx][ny]]);
-//                            contr -= force / rho[(int) field[nx][ny]];
                             continue;
                         }
                         force -= contr * rho[(int) field[nx][ny]];
@@ -448,32 +446,23 @@ int main(int argc, char *argv[]) {
         bool prop = false;
         size_t cycle_iters = 0;
         iters = 0;
-//        std::cerr << " ============== DO =============\n";
         std::set<pair<int, int>> a;
         vector<pair<int, int>> destinations {{0, 0}, {N-1, M-1}, {0, M-1}, {3*N/4-1, M/2}};
         do {
-//            std::cerr << "========= INNER DO ========\n";
             ++cycle_iters;
             UT += 2;
             prop = 0;
             for (size_t x = 0; x < N; ++x) {
                 for (size_t y = 0; y < M; ++y) {
                     if (field[x][y] != '#' && last_use[x][y] != UT) {
-//                        for (auto d : destinations) {
                             auto [t, local_prop, _] = propagate_flow(x, y, destinations[3]);
                             if (t > 0) {
-//                                std::cerr << "x=" << x << ", y=" << y << ", x1=" << x1 << ", y1=" << y1 << ", t=" << t
-//                                          << '\n';
                                 prop = 1;
                             }
-//                        }
                     }
                 }
             }
         } while (prop);
-
-//        std::cerr << "iters/N*M=" << (float)iters / (float)(N * M) << '\n';
-//        std::cerr << "cycle iters=" << cycle_iters <<'\n';
 
         // Recalculate p with kinetic energy
         for (size_t x = 0; x < N; ++x) {
@@ -484,7 +473,6 @@ int main(int argc, char *argv[]) {
                     auto old_v = velocity.get(x, y, dx, dy);
                     auto new_v = velocity_flow.get(x, y, dx, dy);
                     if (old_v > 0) {
-//                        assert(new_v <= old_v);
                         velocity.get(x, y, dx, dy) = new_v;
                         auto force = (old_v - new_v) * rho[(int) field[x][y]];
                         if (field[x][y] == '.')
@@ -528,6 +516,7 @@ int main(int argc, char *argv[]) {
                 }
                 cout << '\n';
             }
+//            printf("%.4lf\n", (clock() - start) / CLOCKS_PER_SEC);
         }
     }
 }
